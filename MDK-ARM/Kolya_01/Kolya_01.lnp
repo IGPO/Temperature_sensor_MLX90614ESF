@@ -1,0 +1,25 @@
+--cpu Cortex-M3
+"kolya_01\startup_stm32f103xb.o"
+"kolya_01\main.o"
+"kolya_01\stm32f1xx_it.o"
+"kolya_01\stm32f1xx_hal_msp.o"
+"kolya_01\i2c.o"
+"kolya_01\stm32f1xx_hal_gpio_ex.o"
+"kolya_01\stm32f1xx_hal_tim.o"
+"kolya_01\stm32f1xx_hal_tim_ex.o"
+"kolya_01\stm32f1xx_hal_uart.o"
+"kolya_01\stm32f1xx_hal.o"
+"kolya_01\stm32f1xx_hal_rcc.o"
+"kolya_01\stm32f1xx_hal_rcc_ex.o"
+"kolya_01\stm32f1xx_hal_gpio.o"
+"kolya_01\stm32f1xx_hal_dma.o"
+"kolya_01\stm32f1xx_hal_cortex.o"
+"kolya_01\stm32f1xx_hal_pwr.o"
+"kolya_01\stm32f1xx_hal_flash.o"
+"kolya_01\stm32f1xx_hal_flash_ex.o"
+"kolya_01\stm32f1xx_hal_exti.o"
+"kolya_01\system_stm32f1xx.o"
+--library_type=microlib --strict --scatter "Kolya_01\Kolya_01.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "Kolya_01.map" -o Kolya_01\Kolya_01.axf

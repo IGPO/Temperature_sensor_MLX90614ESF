@@ -13,6 +13,11 @@
 #define SCL_O HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
 #define SDA_O HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
 //--------------------------------------------------------------------------------
+void SCL_in (void);
+void SCL_out (void);
+void SDA_in (void);
+void SDA_out (void);
+__STATIC_INLINE void Delay_us (uint32_t __IO us);
 void i2c_init (void);               // Инициализация шины
 void i2c_start_cond (void);        // Генерация условия старт
 void i2c_restart_cond (void);      // Генерация условия рестарт

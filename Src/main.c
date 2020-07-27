@@ -35,7 +35,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+__STATIC_INLINE void Delay_us_01 (uint32_t __IO us) //Функция задержки в микросекундах us
+{
+us *=(SystemCoreClock/10000000)/1;
+	while(us--);
+}
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -85,14 +89,47 @@ i2c_stop_cond();
 uint16_t Read_Byte(uint8_t addr, uint8_t reg){
 uint16_t dat;
 i2c_start_cond ();
-RX_buf[0] = i2c_send_byte (addr << 1); //(I2C_ADDR << 1)
-RX_buf[1] = i2c_send_byte    (reg);
+RX_buf[0] = i2c_send_byte(addr<<1); //(I2C_ADDR << 1)
+RX_buf[1] = i2c_send_byte(reg);
 i2c_restart_cond ();
-RX_buf[2] = i2c_send_byte ((addr << 1)+ 1);//((I2C_ADDR << 1) + 1)
+RX_buf[2] = i2c_send_byte(addr + 1);//((I2C_ADDR << 1) + 1)
 dat =  i2c_get_byte(0);	
 i2c_stop_cond();
 return dat;
 }
+uint8_t processing_func(uint8_t data){
+	 uint8_t i;
+ uint8_t ack=1;           //АСК, если АСК=1 – произошла ошибка
+uint16_t SDA;   
+	for (i=0;i<8;i++)
+    {
+        if (data & 0x80) 
+				{
+				SDA_in(); // лог.1
+        }
+				else 
+				{
+				SDA_out(); // Выставить бит на SDA (лог.0
+				}
+        Delay_us_01(1);
+        SCL_in();   // Записать его импульсом на SCL       // отпустить SCL (лог.1)
+        Delay_us_01(1);
+        SCL_out(); // притянуть SCL (лог.0)
+        data<<=1; // сдвигаем на 1 бит влево
+					
+    }
+    SDA_in(); // отпустить SDA (лог.1), чтобы ведомое устройство смогло сгенерировать ACK
+     Delay_us_01(1);
+    SCL_in(); // отпустить SCL (лог.1), чтобы ведомое устройство передало ACK
+     Delay_us_01(1);
+    SDA=SDA_I;
+		if (SDA==0x00) ack=1; else ack=0;    // Считать ACK
+
+    SCL_out(); // притянуть SCL (лог.0)  // приём ACK завершён
+
+    return ack; // вернуть ACK (0) или NACK (1)   
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -146,8 +183,14 @@ HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
   {
 	//	Write_Byte(0,10);
 		for (int ii = 0; ii < 127; ii++){
-	buf[ii] = Write_Byte(ii, 0, ii);		
-	buf[ii] = Read_Byte(ii, 7);
+//	buf[ii] = Write_Byte(ii, 0, ii);		
+//	buf[ii] = Read_Byte(AddrSlave, 7);
+		i2c_start_cond ();
+		Delay_us_01(20);
+		buf[ii] = processing_func(ii); //(I2C_ADDR << 1) + 0x80
+		i2c_stop_cond ();
+			if(buf[ii] == 1){
+				__NOP();}
 		HAL_Delay(150);}
     /* USER CODE END WHILE */
 
